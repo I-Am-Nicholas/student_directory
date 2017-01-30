@@ -21,7 +21,6 @@ def print_header
 end
 
 def print(students)
-  while
   students.each_with_index do |student, inx|
     if student[:name][0] == "r" && student[:name].size < 12
       puts "#{inx + 1}. #{student[:name]} (#{student[:cohort]} cohort)"
