@@ -1,3 +1,5 @@
+require "io/console"
+
 def input_students
 
   students = []
@@ -6,36 +8,42 @@ def input_students
   until next_student != "y"
     student = {}
     count = -1
+
     puts "Please enter the name of the student"
-    info = gets.chomp
+    info = STDIN.noecho(&:gets).chomp
+    puts info.center(36)
 
     while count < 4 do
       count += 1
 
     if count == 0
-      puts "Which cohort?: "
+      puts "Which cohort?: ".center(36)
       student[:name] = info
     elsif count == 1
-      puts "Enter hobbies: "
+      puts info.center(36)
+      puts "Enter hobbies: ".center(36)
       student[:cohort] = info
     elsif count == 2
-      puts "Enter favourite food: "
+      puts info.center(36)
+      puts "Enter favourite food: ".center(36)
       student[:hobbies] = info
     elsif count == 3
-      puts "Enter country of birth: "
+      puts info.center(36)
+      puts "Enter country of birth: ".center(36)
       student[:favourite_food] = info
     elsif count == 4
       student[:country_of_birth] = info
     end
 
     if count == 4
-      puts "Add another student? y : n ?"
-      next_student = gets.chomp
+      puts info.center(36)
+      puts "Add another student? y : n ?".center(36)
+      next_student = STDIN.noecho(&:gets).chomp
+      puts next_student.center(36)
     else
-      info = gets.chomp
+      info = STDIN.noecho(&:gets).chomp
     end
   end
-
   students << student
 end
   students
@@ -47,7 +55,7 @@ def print_header
   puts "-------------"
 end
 
-def print_stud(students)
+def print_students(students)
   count = 0
   while count != students.size
     student = students[count]
@@ -63,6 +71,6 @@ end
 
 students = input_students
 print_header
-print_stud(students)
+print_students(students)
 puts
 print_footer(students)
