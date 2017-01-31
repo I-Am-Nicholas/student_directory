@@ -1,34 +1,43 @@
 def input_students
-  puts "To move on to a new student hit SPACE, then return"
-  puts "To finish, just hit return twice"
-  puts "Please enter the name of the first student"
 
-  students = []
-  student = {}
+	students = []
+  next_student, stdnt = "y", 0
 
-  stdnt, cnt = 0, 0
+  until next_student != "y"
+    student = {}
+		count = -1
+		puts "Please enter the name of the student"
+		info = gets.chomp
 
-  while cnt < 4 do
-    info = gets.chomp
-    if cnt == 0
-      puts "Name: #{info}"
+		while count < 4 do
+	    count += 1
+
+    if count == 0
+      puts "Which cohort?: "
       student[:name] = info
-    elsif cnt == 1
-      puts "Enter hobbies: "
-      student[:hobbies] = info
-    elsif cnt == 2
-      puts "Enter favourite food: "
-      student[:favourite_food] = info
-    elsif cnt == 3
-      puts "Enter country of birth: "
-      student[:country_of_birth] = info
-    elsif info == " "
-      puts "Next student"
-    end
-    cnt += 1
-#    info = gets.chomp
-  end
-  students << student
+      elsif count == 1
+	      puts "Enter hobbies: "
+	      student[:cohort] = info
+	    elsif count == 2
+	      puts "Enter favourite food: "
+	      student[:hobbies] = info
+	    elsif count == 3
+	      puts "Enter country of birth: "
+	      student[:favourite_food] = info
+	    elsif count == 4
+	      student[:country_of_birth] = info
+	    end
+
+	    if count == 4
+				puts "Add another student? y : n ?"
+				next_student = gets.chomp
+			else
+				info = gets.chomp
+			end
+		end
+
+	  students << student
+	end
   students
 end
 
@@ -38,20 +47,22 @@ def print_header
   puts "-------------"
 end
 
-def print(students)
-  cnt = 0
-  while cnt < students.size
-    student = students[cnt]
-      puts "#{student[:name]} #{student[:hobbies]} #{student[:favourite_food]} #{student[:country_of_birth]}"
-    cnt += 1
+def print_stud(students)
+  count = 0
+  while count != students.size
+    student = students[count]
+      puts "#{count + 1}. #{student[:name]} from the #{student[:cohort]} cohort likes #{student[:hobbies]} and #{student[:favourite_food]} and was born in #{student[:country_of_birth]}"
+    count += 1
   end
 end
 
 def print_footer(students)
-  puts "Overall, we have #{students.count} great students"
+  students.size > 1 ? s = "s" : s = ""
+  puts "Overall, we have #{students.count} great student#{s}"
 end
 
 students = input_students
 print_header
-print(students)
+print_stud(students)
+puts
 print_footer(students)
