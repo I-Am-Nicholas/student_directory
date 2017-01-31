@@ -5,22 +5,23 @@ def input_students
   students = []
   next_student, stdnt = "y", 0
 
-  arr = [[:name, "Which cohort?: "], [:cohort, "Enter hobbies: "], [:hobbies, "Enter favourite food: "],
+  $arr = [[:name, "Which cohort?: "], [:cohort, "Enter hobbies: "], [:hobbies, "Enter favourite food: "],
         [:favourite_food, "Enter country of birth: "], [:country, "Add another student? y : n ?"]]
 
   until next_student != "y"
     student = {}
     count = -1
-
+    puts
     puts first_line = "Please enter the name of the student"
     info = STDIN.noecho(&:gets).chomp
 
     while count < 4 do
+      info = "[No input]" if info == ""
       count += 1
       puts info.center(first_line.size - 2)
       puts
-      puts (arr[count][1]).center(first_line.size)
-      student[(arr[count][0])] = info
+      puts ($arr[count][1]).center(first_line.size)
+      student[($arr[count][0])] = info
 
       if count == 4
         next_student = STDIN.noecho(&:gets).chomp
@@ -45,9 +46,12 @@ def print_students(students)
   count = 0
   while count != students.size
     student = students[count]
-    puts "#{count + 1}. #{student[:name]} from the #{student[:cohort]} cohort".center(36)
-    puts "likes #{student[:hobbies]} and #{student[:favourite_food]}".center(36)
-    puts "and was born in #{student[:country]}".center(36)
+    puts "(#{count +1})".center(36)
+    x = 0
+    until x == $arr.size
+      puts "#{($arr[x][0]).to_s}: #{student[($arr[x][0])]}".center(36)
+      x += 1
+    end
     count += 1
     puts
   end
