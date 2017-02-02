@@ -14,7 +14,7 @@ def input_students
     puts
     puts first_line = "Please enter the name of the student"
     puts
-    info = STDIN.noecho(&:gets).chomp
+    info = STDIN.noecho(&:gets).sub("\n", "")
     $l = first_line.size
 
     while count < $arr.size - 1 do
@@ -32,12 +32,12 @@ def input_students
           puts "the corresponding number".center($l)
           puts "To exit this option, press ENTER.".center($l)
           puts
-          error_num = STDIN.noecho(&:gets).chomp
+          error_num = STDIN.noecho(&:gets).sub("\n", "")
           error_num == "" ? break : error_num = error_num.to_i
 
           while !(1..$arr.size).include?(error_num)
             puts "Invalid entry. Try again.".center($l)
-            error_num = STDIN.noecho(&:gets).chomp
+            error_num = STDIN.noecho(&:gets).sub("\n", "")
             error_num == "" ? break : error_num = error_num.to_i
           end
 
@@ -46,31 +46,31 @@ def input_students
           wrong = student[($arr[error_num -1][0])]
           puts
           puts "Changing: #{wrong}".center($l)
-          right = STDIN.noecho(&:gets).chomp
+          right = STDIN.noecho(&:gets).sub("\n", "")
           student[($arr[error_num - 1][0])] = right
           puts "Changed #{wrong} to #{right}.".center($l)
           puts
           puts "Any more errors? y : n".center($l)
-          error = STDIN.noecho(&:gets).chomp
+          error = STDIN.noecho(&:gets).sub("\n", "")
           puts error.center($l)
           puts
           until error == "y" || error == "n"
             puts "Invalid entry. Try again.".center($l)
-            error = STDIN.noecho(&:gets).chomp
+            error = STDIN.noecho(&:gets).sub("\n", "")
             puts error.center($l)
           end
         end
       end
 
-      info = STDIN.noecho(&:gets).chomp if count < $arr.size - 1
+      info = STDIN.noecho(&:gets).sub("\n", "") if count < $arr.size - 1
       if count == $arr.size - 1
         puts
         puts "Add another student? y : n ?".center($l)
-        next_student = STDIN.noecho(&:gets).chomp
+        next_student = STDIN.noecho(&:gets).sub("\n", "")
 
         until next_student == "y" || next_student == "n"
           puts "Invalid entry. Try again.".center($l)
-          next_student = STDIN.noecho(&:gets).chomp
+          next_student = STDIN.noecho(&:gets).sub("\n", "")
         end
 
         puts next_student.center($l)
