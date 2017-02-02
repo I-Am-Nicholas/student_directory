@@ -69,12 +69,10 @@ def input_students
         puts "Add another student? y : n ?".center($l)
         next_student = STDIN.noecho(&:gets).chomp
 
-
         until next_student == "y" || next_student == "n"
           puts "Invalid entry. Try again.".center($l)
           next_student = STDIN.noecho(&:gets).chomp
         end
-
 
         puts next_student.center($l)
       end
@@ -91,6 +89,7 @@ def print_header
   puts "--------------------------------".center($l)
 end
 
+
 def print_students(students)
   count = 0
   while count != students.size
@@ -106,6 +105,34 @@ def print_students(students)
   end
 end
 
+
+def by_cohort(students)
+arr = []
+  students.each_with_index do |i, ix|
+    month = i[:cohort]
+    unless arr.include?(month)
+
+      if ix == 0
+        arr << month
+        puts
+        puts "Students from the #{month} cohort: ".center($l)
+      else
+        puts
+        puts "Students from the #{month} cohort: ".center($l) if !arr.include?(month)
+        arr << month
+      end
+
+      students.each do |i2|
+        if i2[:cohort] == month
+          puts ("Name: #{i2[:name]}").center($l)
+        end
+      end
+
+    end
+  end
+end
+
+
 def print_footer(students)
   students.size > 1 ? s = "s" : s = ""
   puts "Overall, we have #{students.count} great student#{s}".center($l)
@@ -114,6 +141,8 @@ end
 
 students = input_students
 print_header
-print_students(students)
+
+by_cohort(students)
+#print_students(students)
 puts
 print_footer(students)
