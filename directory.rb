@@ -5,8 +5,7 @@ def input_students
   students = []
   next_student, stdnt = "y", 0
 
-  $arr = [[:name, "Which cohort?:"], [:cohort, "Enter hobbies:"], [:hobbies, "Enter favourite food:"],
-        [:favourite_food, "Enter country of birth:"], [:country, "Please check for errors."]]
+  $arr = [[:name, "Which cohort?:"], [:cohort, "Please check for errors."]]
 
   until next_student == "n"
     student = {}
@@ -90,22 +89,6 @@ def print_header
 end
 
 
-def print_students(students)
-  count = 0
-  while count != students.size
-    student = students[count]
-    puts "(#{count +1})".center($l)
-    x = 0
-    until x == $arr.size
-      puts "#{($arr[x][0]).to_s}: #{student[($arr[x][0])]}".center($l)
-      x += 1
-    end
-    count += 1
-    puts
-  end
-end
-
-
 def by_cohort(students)
 arr = []
   students.each_with_index do |i, ix|
@@ -141,8 +124,6 @@ end
 
 students = input_students
 print_header
-
 by_cohort(students)
-#print_students(students)
 puts
 print_footer(students)
