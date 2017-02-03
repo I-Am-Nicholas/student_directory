@@ -21,6 +21,7 @@ def interactive_menu
         by_cohort(students)
         print_footer(students)
       when "9"
+        puts
         exit
       else
         puts "I don't know what you meant, try again"
@@ -31,10 +32,8 @@ end
 
 
 def input_students
-
   students = []
   name_count, next_student, stdnt = 0, "y", 0
-
   $arr = [[:name, "Which cohort?:"], [:cohort, "Please check for errors."]]
 
   until next_student == "n"
