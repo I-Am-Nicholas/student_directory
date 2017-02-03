@@ -1,15 +1,47 @@
 require "io/console"
+$l = 36
+def interactive_menu
+  students = []
+  loop do
+    # 1. print the menu and ask the user what to do
+    puts
+    puts "1. Input the students".center($l)
+    puts "2. Show the students".center($l)
+    puts "9. Exit".center($l)
+
+
+    # 2. read the input and save it into a variable.
+    selection = STDIN.noecho(&:gets).sub("\n", "")
+    # 3. do what the user asked.
+    case selection
+      when "1"
+        students = input_students
+      when "2"
+        print_header
+        by_cohort(students)
+        print_footer(students)
+      when "9"
+        exit
+      else
+        puts "I don't know what you meant, try again"
+    # 4. repeat from step 1
+    end
+  end
+end
+
 
 def input_students
 
   students = []
-  next_student, stdnt = "y", 0
+  name_count, next_student, stdnt = 0, "y", 0
 
   $arr = [[:name, "Which cohort?:"], [:cohort, "Please check for errors."]]
 
   until next_student == "n"
     student = {}
+    name_count += 1
     count = -1
+
     err_input = 0
     puts
     puts first_line = "Please enter the name of the student"
@@ -18,9 +50,9 @@ def input_students
     $l = first_line.size
 
     while count < $arr.size - 1 do
-      info = "[No input]" if info == ""
+      exit if info == ""
       count += 1
-      puts ("#{count +1}. " + info).center($l)
+      puts count.even? ? ("#{name_count}. " + info).center($l) : info.center($l)
       puts
       puts ($arr[count][1]).center($l)
       student[($arr[count][0])] = info
@@ -61,7 +93,6 @@ def input_students
           end
         end
       end
-
       info = STDIN.noecho(&:gets).sub("\n", "") if count < $arr.size - 1
       if count == $arr.size - 1
         puts
@@ -72,7 +103,6 @@ def input_students
           puts "Invalid entry. Try again.".center($l)
           next_student = STDIN.noecho(&:gets).sub("\n", "")
         end
-
         puts next_student.center($l)
       end
     end
@@ -122,6 +152,7 @@ def print_footer(students)
   puts
 end
 
+interactive_menu
 students = input_students
 print_header
 by_cohort(students)
