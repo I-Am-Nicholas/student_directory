@@ -2,34 +2,43 @@ require "io/console"
 
 @students = []
 $l = 36
+
+
 def interactive_menu
-# @students = []
   loop do
-    # 1. print the menu and ask the user what to do
-    puts
+    print_menu
+    process(STDIN.noecho(&:gets).sub("\n", ""))
+  end
+end
+
+
+def process(selection)
+  case selection
+    when "1"
+     @students = input_students
+    when "2"
+      show_students
+    when "9"
+      puts
+      exit
+    else
+      puts "I don't know what you meant, try again"
+  end
+end
+
+
+
+def print_menu
     puts "1. Input the students".center($l)
     puts "2. Show the students".center($l)
     puts "9. Exit".center($l)
+end
 
 
-    # 2. read the input and save it into a variable.
-    selection = STDIN.noecho(&:gets).sub("\n", "")
-    # 3. do what the user asked.
-    case selection
-      when "1"
-       @students = input_students
-      when "2"
-        print_header
-        by_cohort
-        print_footer
-      when "9"
-        puts
-        exit
-      else
-        puts "I don't know what you meant, try again"
-    # 4. repeat from step 1
-    end
-  end
+def show_students
+  print_header
+  print_students_list
+  print_footer
 end
 
 
@@ -104,6 +113,7 @@ def input_students
           next_student = STDIN.noecho(&:gets).sub("\n", "")
         end
         puts next_student.center($l)
+        puts
       end
     end
    @students << student
@@ -119,7 +129,7 @@ def print_header
 end
 
 
-def by_cohort
+def print_students_list
 arr = []
  @students.each_with_index do |i, ix|
     month = i[:cohort]
@@ -147,7 +157,7 @@ end
 
 
 def print_footer
- @students.size > 1 ? s = "s" : s = ""
+ @students.size != 1 ? s = "s" : s = ""
   puts "Overall, we have #{@students.count} great student#{s}".center($l)
   puts
 end
@@ -155,6 +165,6 @@ end
 interactive_menu
 @students = input_students
 print_header
-by_cohort
+print_students_list
 puts
 print_footer
