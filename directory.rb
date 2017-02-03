@@ -1,7 +1,9 @@
 require "io/console"
+
+@students = []
 $l = 36
 def interactive_menu
-  students = []
+# @students = []
   loop do
     # 1. print the menu and ask the user what to do
     puts
@@ -15,11 +17,11 @@ def interactive_menu
     # 3. do what the user asked.
     case selection
       when "1"
-        students = input_students
+       @students = input_students
       when "2"
         print_header
-        by_cohort(students)
-        print_footer(students)
+        by_cohort
+        print_footer
       when "9"
         puts
         exit
@@ -32,7 +34,7 @@ end
 
 
 def input_students
-  students = []
+ #@students = []
   name_count, next_student, stdnt = 0, "y", 0
   $arr = [[:name, "Which cohort?:"], [:cohort, "Please check for errors."]]
 
@@ -104,9 +106,9 @@ def input_students
         puts next_student.center($l)
       end
     end
-    students << student
+   @students << student
   end
-  students
+ @students
 end
 
 
@@ -117,9 +119,9 @@ def print_header
 end
 
 
-def by_cohort(students)
+def by_cohort
 arr = []
-  students.each_with_index do |i, ix|
+ @students.each_with_index do |i, ix|
     month = i[:cohort]
     unless arr.include?(month)
 
@@ -133,7 +135,7 @@ arr = []
         arr << month
       end
 
-      students.each do |i2|
+     @students.each do |i2|
         if i2[:cohort] == month
           puts ("Name: #{i2[:name]}").center($l)
         end
@@ -144,15 +146,15 @@ arr = []
 end
 
 
-def print_footer(students)
-  students.size > 1 ? s = "s" : s = ""
-  puts "Overall, we have #{students.count} great student#{s}".center($l)
+def print_footer
+ @students.size > 1 ? s = "s" : s = ""
+  puts "Overall, we have #{@students.count} great student#{s}".center($l)
   puts
 end
 
 interactive_menu
-students = input_students
+@students = input_students
 print_header
-by_cohort(students)
+by_cohort
 puts
-print_footer(students)
+print_footer
