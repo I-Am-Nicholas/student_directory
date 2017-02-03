@@ -59,26 +59,25 @@ def input_students
 
       if count == $arr.size - 1
         until error == "n"
-          puts "To corrct an entry just enter".center($l)
-          puts "the corresponding number".center($l)
+          puts "To correct name, type 'n' then enter".center($l)
+          puts "To correct cohort, type 'c' then enter".center($l)
           puts "To exit this option, press ENTER.".center($l)
           puts
           error_num = STDIN.noecho(&:gets).sub("\n", "")
-          error_num == "" ? break : error_num = error_num.to_i
+          error_num == "" ? break : error_num
 
-          while !(1..$arr.size).include?(error_num)
+          while !['n', 'c'].include?(error_num)
             puts "Invalid entry. Try again.".center($l)
             error_num = STDIN.noecho(&:gets).sub("\n", "")
-            error_num == "" ? break : error_num = error_num.to_i
+            error_num == "" ? break : error_num = error_num
           end
 
           break if error_num == ""
-
-          wrong = student[($arr[error_num -1][0])]
+          error_num == "n" ? wrong = student[($arr[0][0])] : wrong = student[($arr[1][0])]
           puts
           puts "Changing: #{wrong}".center($l)
           right = STDIN.noecho(&:gets).sub("\n", "")
-          student[($arr[error_num - 1][0])] = right
+          error_num == "n" ? student[($arr[0][0])] = right : student[($arr[1][0])] = right
           puts "Changed #{wrong} to #{right}.".center($l)
           puts
           puts "Any more errors? y : n".center($l)
