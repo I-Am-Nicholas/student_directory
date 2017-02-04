@@ -49,18 +49,31 @@ def show_students
 end
 
 
-def load_students
-  file = File.open("students.csv", "r")
+def load_students(filename = "students.csv")
+  file = File.open(filename, "a+")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(",")
-    @students << {name: name, cohort: cohort.to_sym}
+    @students << {name: name, cohort: cohort.to_sym} ###############################
   end
   file.close
 end
 
 
+def try_load_students
+  filename = ARGV.first
+  return if filename.nil?
+  if File.exists?(filename)
+    load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
+  else
+    puts "Sorry #{filename} doesn't exist."
+    exit
+  end
+end
+
+
 def save_students
-  file = File.open("students.csv", "w")
+  file = File.open("students.csv", "a+")
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
     csv_line = student_data.join(",")
@@ -70,16 +83,21 @@ def save_students
 end
 
 
-def input_students
-  name_count, next_student, stdnt = 0, "y", 0
-  $arr = [[:name, "Which cohort?:"], [:cohort, "Please check for errors."]]
+def error_correct
+  puts "To correct name, type 'n' then enter".center($l)
+  puts "To correct cohort, type 'c' then enter".center($l)
+  puts "To exit this option, press ENTER.".center($l)
+  puts
+end
 
-  until next_student == "n"
+
+def input_students
+  name_count, error = 0, ""
+  $arr = [[:name, "Which cohort?:"], [:cohort, "Please check for errors."]]
+  until error == "n"
     student = {}
     name_count += 1
     count = -1
-
-    err_input = 0
     puts
     puts first_line = "Please enter the name of the student"
     puts
@@ -97,21 +115,15 @@ def input_students
 
       if count == $arr.size - 1
         until error == "n"
-          puts "To correct name, type 'n' then enter".center($l)
-          puts "To correct cohort, type 'c' then enter".center($l)
-          puts "To exit this option, press ENTER.".center($l)
-          puts
+          error_correct
           error_num = STDIN.noecho(&:gets).sub("\n", "")
           error_num == "" ? break : error_num
+          wrong = ""
+          invalid_entry(error_num)
+          wrong = student[($arr[0][0])] if error_num == "n"
+          wrong = student[($arr[1][0])] if error_num == "c"
 
-          while !['n', 'c'].include?(error_num)
-            puts "Invalid entry. Try again.".center($l)
-            error_num = STDIN.noecho(&:gets).sub("\n", "")
-            error_num == "" ? break : error_num = error_num
-          end
 
-          break if error_num == ""
-          error_num == "n" ? wrong = student[($arr[0][0])] : wrong = student[($arr[1][0])]
           puts
           puts "Changing: #{wrong}".center($l)
           right = STDIN.noecho(&:gets).sub("\n", "")
@@ -119,33 +131,59 @@ def input_students
           puts "Changed #{wrong} to #{right}.".center($l)
           puts
           puts "Any more errors? y : n".center($l)
-          error = STDIN.noecho(&:gets).sub("\n", "")
-          puts error.center($l)
+          error_more = STDIN.noecho(&:gets).sub("\n", "")
           puts
-          until error == "y" || error == "n"
-            puts "Invalid entry. Try again.".center($l)
-            error = STDIN.noecho(&:gets).sub("\n", "")
-            puts error.center($l)
-          end
+          check = invalid(error_more)
+          add_student(student) unless check == "y"
+          error = check
         end
       end
       info = STDIN.noecho(&:gets).sub("\n", "") if count < $arr.size - 1
       if count == $arr.size - 1
-        puts
-        puts "Add another student? y : n ?".center($l)
-        next_student = STDIN.noecho(&:gets).sub("\n", "")
-
-        until next_student == "y" || next_student == "n"
-          puts "Invalid entry. Try again.".center($l)
-          next_student = STDIN.noecho(&:gets).sub("\n", "")
-        end
-        puts next_student.center($l)
-        puts
+        add_student(student)
       end
-    end
-   @students << student
-  end
+    end #while
+    push_to_arr(student)
+ end # until
  @students
+end
+
+def push_to_arr(student)
+  @students << student
+end
+
+
+def add_student(student)
+  puts
+  puts "Add another student? y : n ?".center($l)
+  student_error = STDIN.noecho(&:gets).sub("\n", "")
+  puts
+  invalid(student_error)
+  if student_error == "n"
+    push_to_arr(student)
+    interactive_menu
+  else
+    push_to_arr(student)
+    input_students
+  end
+end
+
+
+def invalid(error)
+  until error == "y" || error == "n"
+    puts "Invalid entry, Nick. Try again.".center($l)
+    error = STDIN.noecho(&:gets).sub("\n", "")
+  end
+  error
+end
+
+
+def invalid_entry(error_num)
+  while !['n', 'c'].include?(error_num)
+    puts "Invalid entry. Try again.".center($l)
+    error_num = STDIN.noecho(&:gets).sub("\n", "")
+    return (student) if error_num == ""
+  end
 end
 
 
@@ -157,8 +195,8 @@ end
 
 
 def print_students_list
-arr = []
- @students.each_with_index do |i, ix|
+  arr = []
+  @students.each_with_index do |i, ix|
     month = i[:cohort]
     unless arr.include?(month)
 
@@ -177,7 +215,6 @@ arr = []
           puts ("Name: #{i2[:name]}").center($l)
         end
       end
-
     end
   end
 end
@@ -185,10 +222,13 @@ end
 
 def print_footer
  @students.size != 1 ? s = "s" : s = ""
+  puts
   puts "Overall, we have #{@students.count} great student#{s}".center($l)
   puts
 end
 
+
+try_load_students
 interactive_menu
 @students = input_students
 print_header
