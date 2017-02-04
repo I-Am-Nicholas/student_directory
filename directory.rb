@@ -1,7 +1,7 @@
 require "io/console"
 
 @students = []
-$l = 36
+$l = 50
 
 
 def interactive_menu
@@ -21,8 +21,14 @@ def process(selection)
     when "3"
       save_students
     when "4"
-      load_students
-    when "9"
+      puts "Please supply a filename: ".center($l)
+      filename = STDIN.gets.sub("\n", "")
+#      puts filename.center($l)
+      load_students(filename)
+    when "5"
+      puts
+      puts "Exited program.".center($l)
+      puts
       puts
       exit
     else
@@ -35,9 +41,9 @@ def print_menu
     puts
     puts "1. Input the students".center($l)
     puts "2. Show the students".center($l)
-    puts "3. Save the list to students CSV.".center($l)
-    puts "4. Load the list from students CSV.".center($l)
-    puts "9. Exit".center($l)
+    puts "3. Save to specified CSV file.".center($l)
+    puts "4. Load from specified CSV file.".center($l)
+    puts "5. Exit".center($l)
     puts
 end
 
@@ -50,36 +56,48 @@ end
 
 
 def load_students(filename = "students.csv")
+  file_exists?(filename)
   file = File.open(filename, "a+")
   file.readlines.each do |line|
     name, cohort = line.chomp.split(",")
-    @students << {name: name, cohort: cohort.to_sym} ###############################
+    @students << {name: name, cohort: cohort.to_sym}
   end
   file.close
+  puts
+  puts "Successfully loaded from #{filename}".center($l)
+end
+
+def file_exists?(filename)
+  if !File.exists?(filename)
+    puts
+    puts "Sorry #{filename} doesn't exist.".center($l)
+    puts
+    interactive_menu
+    #exit
+  end
 end
 
 
 def try_load_students
   filename = ARGV.first
   return if filename.nil?
-  if File.exists?(filename)
-    load_students(filename)
-    puts "Loaded #{@students.count} from #{filename}"
-  else
-    puts "Sorry #{filename} doesn't exist."
-    exit
-  end
+  file_exists?(filename)
+  load_students(filename)
 end
 
 
 def save_students
-  file = File.open("students.csv", "a+")
+  puts "Please supply a filename: ".center($l)
+  filename = STDIN.noecho(&:gets).sub("\n", "")
+  file_exists?(filename)
+  file = File.open(filename, "a+")
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
     csv_line = student_data.join(",")
     file.puts csv_line
   end
   file.close
+  puts "Successfully saved to #{filename}.".center($l)
 end
 
 
@@ -99,7 +117,7 @@ def input_students
     name_count += 1
     count = -1
     puts
-    puts first_line = "Please enter the name of the student"
+    puts first_line = "Please enter the name of the student".center($l)
     puts
     info = STDIN.noecho(&:gets).sub("\n", "")
     $l = first_line.size
@@ -119,10 +137,9 @@ def input_students
           error_num = STDIN.noecho(&:gets).sub("\n", "")
           error_num == "" ? break : error_num
           wrong = ""
-          invalid_entry(error_num)
+          invalid_entry(error_num, student)
           wrong = student[($arr[0][0])] if error_num == "n"
           wrong = student[($arr[1][0])] if error_num == "c"
-
 
           puts
           puts "Changing: #{wrong}".center($l)
@@ -142,9 +159,9 @@ def input_students
       if count == $arr.size - 1
         add_student(student)
       end
-    end #while
+    end
     push_to_arr(student)
- end # until
+ end
  @students
 end
 
@@ -171,18 +188,18 @@ end
 
 def invalid(error)
   until error == "y" || error == "n"
-    puts "Invalid entry, Nick. Try again.".center($l)
+    puts "Invalid entry. Try again.".center($l)
     error = STDIN.noecho(&:gets).sub("\n", "")
   end
   error
 end
 
 
-def invalid_entry(error_num)
+def invalid_entry(error_num, student)
   while !['n', 'c'].include?(error_num)
     puts "Invalid entry. Try again.".center($l)
     error_num = STDIN.noecho(&:gets).sub("\n", "")
-    return (student) if error_num == ""
+    return add_student(student) if error_num == ""
   end
 end
 
@@ -229,6 +246,7 @@ end
 
 
 try_load_students
+#load_students #added for Ex.14 No.2
 interactive_menu
 @students = input_students
 print_header
