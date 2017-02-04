@@ -1,13 +1,10 @@
-require "io/console"
-
 @students = []
 $l = 50
-
 
 def interactive_menu
   loop do
     print_menu
-    process(STDIN.noecho(&:gets).sub("\n", ""))
+    process(STDIN.gets.sub("\n", ""))
   end
 end
 
@@ -23,13 +20,10 @@ def process(selection)
     when "4"
       puts "Please supply a filename: ".center($l)
       filename = STDIN.gets.sub("\n", "")
-#      puts filename.center($l)
       load_students(filename)
     when "5"
       puts
-      puts "Exited program.".center($l)
-      puts
-      puts
+      puts "Exited program.\n\n".center($l)
       exit
     else
       puts "I don't know what you meant, try again"
@@ -57,23 +51,26 @@ end
 
 def load_students(filename = "students.csv")
   file_exists?(filename)
-  file = File.open(filename, "a+")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(",")
-    @students << {name: name, cohort: cohort.to_sym}
+  open(filename, mode= "a+") do |fl|
+    fl.readlines.each do |line|
+      name, cohort = line.chomp.split(",")
+      @students << {name: name, cohort: cohort.to_sym}
+    end
   end
-  file.close
   puts
   puts "Successfully loaded from #{filename}".center($l)
 end
 
+
 def file_exists?(filename)
-  if !File.exists?(filename)
+  if filename.empty?
+    puts "You entered a blank value. Try again.".center($l)
+    interactive_menu
+  elsif !File.exists?(filename)
     puts
-    puts "Sorry #{filename} doesn't exist.".center($l)
+    puts "Sorry. #{filename} doesn't exist in this directory.".center($l)
     puts
     interactive_menu
-    #exit
   end
 end
 
@@ -88,16 +85,17 @@ end
 
 def save_students
   puts "Please supply a filename: ".center($l)
-  filename = STDIN.noecho(&:gets).sub("\n", "")
+  filename = STDIN.gets.sub("\n", "")
   file_exists?(filename)
-  file = File.open(filename, "a+")
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+
+  open(filename, mode= "a+") do |fl|
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort]]
+      csv_line = student_data.join(",")
+      fl.puts csv_line
+    end
+    puts "Successfully saved to #{filename}.".center($l)
   end
-  file.close
-  puts "Successfully saved to #{filename}.".center($l)
 end
 
 
@@ -119,11 +117,14 @@ def input_students
     puts
     puts first_line = "Please enter the name of the student".center($l)
     puts
-    info = STDIN.noecho(&:gets).sub("\n", "")
+    info = STDIN.gets.sub("\n", "")
     $l = first_line.size
 
     while count < $arr.size - 1 do
-      exit if info == ""
+      if info == ""
+        puts "You entered a blank value.\n\n".center($l)
+        exit
+      end
       count += 1
       puts count.even? ? ("#{name_count}. " + info).center($l) : info.center($l)
       puts
@@ -134,7 +135,7 @@ def input_students
       if count == $arr.size - 1
         until error == "n"
           error_correct
-          error_num = STDIN.noecho(&:gets).sub("\n", "")
+          error_num = STDIN.gets.sub("\n", "")
           error_num == "" ? break : error_num
           wrong = ""
           invalid_entry(error_num, student)
@@ -143,19 +144,19 @@ def input_students
 
           puts
           puts "Changing: #{wrong}".center($l)
-          right = STDIN.noecho(&:gets).sub("\n", "")
+          right = STDIN.gets.sub("\n", "")
           error_num == "n" ? student[($arr[0][0])] = right : student[($arr[1][0])] = right
           puts "Changed #{wrong} to #{right}.".center($l)
           puts
           puts "Any more errors? y : n".center($l)
-          error_more = STDIN.noecho(&:gets).sub("\n", "")
+          error_more = STDIN.gets.sub("\n", "")
           puts
           check = invalid(error_more)
           add_student(student) unless check == "y"
           error = check
         end
       end
-      info = STDIN.noecho(&:gets).sub("\n", "") if count < $arr.size - 1
+      info = STDIN.gets.sub("\n", "") if count < $arr.size - 1
       if count == $arr.size - 1
         add_student(student)
       end
@@ -173,7 +174,7 @@ end
 def add_student(student)
   puts
   puts "Add another student? y : n ?".center($l)
-  student_error = STDIN.noecho(&:gets).sub("\n", "")
+  student_error = STDIN.gets.sub("\n", "")
   puts
   invalid(student_error)
   if student_error == "n"
@@ -189,7 +190,7 @@ end
 def invalid(error)
   until error == "y" || error == "n"
     puts "Invalid entry. Try again.".center($l)
-    error = STDIN.noecho(&:gets).sub("\n", "")
+    error = STDIN.gets.sub("\n", "")
   end
   error
 end
@@ -198,7 +199,7 @@ end
 def invalid_entry(error_num, student)
   while !['n', 'c'].include?(error_num)
     puts "Invalid entry. Try again.".center($l)
-    error_num = STDIN.noecho(&:gets).sub("\n", "")
+    error_num = STDIN.gets.sub("\n", "")
     return add_student(student) if error_num == ""
   end
 end
