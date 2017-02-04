@@ -1,5 +1,7 @@
+require 'csv'
+
 @students = []
-$l = 50
+$l = 75
 
 def interactive_menu
   loop do
@@ -22,11 +24,10 @@ def process(selection)
       filename = STDIN.gets.sub("\n", "")
       load_students(filename)
     when "5"
-      puts
-      puts "Exited program.\n\n".center($l)
+      puts "Exited the program.\n\n".center($l)
       exit
     else
-      puts "I don't know what you meant, try again"
+      puts "I don't know what you meant. Try again.\n".center($l)
   end
 end
 
@@ -37,8 +38,7 @@ def print_menu
     puts "2. Show the students".center($l)
     puts "3. Save to specified CSV file.".center($l)
     puts "4. Load from specified CSV file.".center($l)
-    puts "5. Exit".center($l)
-    puts
+    puts "5. Exit\n".center($l)
 end
 
 
@@ -48,19 +48,14 @@ def show_students
   print_footer
 end
 
-
-def load_students(filename = "students.csv")
+def load_students(filename) #Ex.14 No.7
   file_exists?(filename)
-  open(filename, mode= "a+") do |fl|
-    fl.readlines.each do |line|
-      name, cohort = line.chomp.split(",")
-      @students << {name: name, cohort: cohort.to_sym}
-    end
+  CSV.foreach(filename, "a+") do |fl|
+    @students << {name: fl[0], cohort: fl[1].to_sym}
   end
   puts
   puts "Successfully loaded from #{filename}".center($l)
 end
-
 
 def file_exists?(filename)
   if filename.empty?
@@ -68,8 +63,7 @@ def file_exists?(filename)
     interactive_menu
   elsif !File.exists?(filename)
     puts
-    puts "Sorry. #{filename} doesn't exist in this directory.".center($l)
-    puts
+    puts "Sorry. #{filename} doesn't exist in this directory.\n".center($l)
     interactive_menu
   end
 end
@@ -83,27 +77,23 @@ def try_load_students
 end
 
 
-def save_students
+def save_students #Ex.14 No.7
   puts "Please supply a filename: ".center($l)
   filename = STDIN.gets.sub("\n", "")
   file_exists?(filename)
-
-  open(filename, mode= "a+") do |fl|
+  CSV.open(filename, "a+") do |csv|
     @students.each do |student|
-      student_data = [student[:name], student[:cohort]]
-      csv_line = student_data.join(",")
-      fl.puts csv_line
+      csv << [student[:name], student[:cohort]]
     end
-    puts "Successfully saved to #{filename}.".center($l)
   end
+  puts "Successfully saved to #{filename}.".center($l)
 end
 
 
 def error_correct
   puts "To correct name, type 'n' then enter".center($l)
   puts "To correct cohort, type 'c' then enter".center($l)
-  puts "To exit this option, press ENTER.".center($l)
-  puts
+  puts "To exit this option, press ENTER.\n".center($l)
 end
 
 
