@@ -24,6 +24,8 @@ def process(selection)
       filename = STDIN.gets.sub("\n", "")
       load_students(filename)
     when "5"
+      own_source
+    when "6"
       puts "Exited the program.\n\n".center($l)
       exit
     else
@@ -38,7 +40,8 @@ def print_menu
     puts "2. Show the students".center($l)
     puts "3. Save to specified CSV file.".center($l)
     puts "4. Load from specified CSV file.".center($l)
-    puts "5. Exit\n".center($l)
+    puts "5. View source code?".center($l)
+    puts "6. Exit\n".center($l)
 end
 
 
@@ -59,7 +62,8 @@ end
 
 def file_exists?(filename)
   if filename.empty?
-    puts "You entered a blank value. Try again.".center($l)
+    puts "You entered a blank value.".center($l)
+    puts "Select and try again.".center($l)
     interactive_menu
   elsif !File.exists?(filename)
     puts
@@ -105,8 +109,7 @@ def input_students
     name_count += 1
     count = -1
     puts
-    puts first_line = "Please enter the name of the student".center($l)
-    puts
+    puts first_line = "Please enter the name of the student\n".center($l)
     info = STDIN.gets.sub("\n", "")
     $l = first_line.size
 
@@ -155,6 +158,7 @@ def input_students
  end
  @students
 end
+
 
 def push_to_arr(student)
   @students << student
@@ -235,6 +239,9 @@ def print_footer
   puts
 end
 
+def own_source
+  open(__FILE__){|r| puts (r.read)}
+end
 
 try_load_students
 #load_students #added for Ex.14 No.2
