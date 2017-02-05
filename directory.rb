@@ -54,14 +54,11 @@ end
 
 def try_load_students
   filename = ARGV.first
-  return if filename.nil?
   file_exists?(filename)
-  load_students(filename)
 end
 
 
-def load_students(filename = "students.csv") #Ex.14 No.7
-  file_exists?(filename)
+def load_students(filename)
   CSV.foreach(filename, "a+") do |fl|
     @students << {name: fl[0], cohort: fl[1].to_sym}
   end
@@ -71,7 +68,9 @@ end
 
 
 def file_exists?(filename)
-  if filename.empty?
+  if filename == nil
+    load_students("students.csv")
+  elsif filename.empty?
     puts "You entered a blank value.".center(@l)
     puts "Select and try again.".center(@l)
     interactive_menu
@@ -79,6 +78,8 @@ def file_exists?(filename)
     puts
     puts "Sorry. #{filename} doesn't exist in this directory.\n".center(@l)
     interactive_menu
+  else
+    load_students(filename)
   end
 end
 
@@ -256,7 +257,7 @@ end
 
 
 try_load_students
-load_students #added for Ex.14 No.2
+#load_students #added for Ex.14 No.2
 interactive_menu
 @students = input_students
 print_header
