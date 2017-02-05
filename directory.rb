@@ -231,9 +231,9 @@ def print_students_list
         arr << month
       end
 
-     @students.each do |i2|
+     @students.each_with_index do |i2, idx|
         if i2[:cohort] == month
-          puts ("Name: #{i2[:name]}").center(@l)
+          puts ("#{idx + 1}. #{i2[:name]}").center(@l)
         end
       end
 
