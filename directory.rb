@@ -1,7 +1,7 @@
 require 'csv'
-
 @students = []
-$l = 75
+@l = 75
+
 
 def interactive_menu
   loop do
@@ -20,28 +20,28 @@ def process(selection)
     when "3"
       save_students
     when "4"
-      puts "Please supply a filename: ".center($l)
+      puts "Please supply a filename: ".center(@l)
       filename = STDIN.gets.sub("\n", "")
       load_students(filename)
     when "5"
       own_source
     when "6"
-      puts "Exited the program.\n\n".center($l)
+      puts "Exited the program.\n\n".center(@l)
       exit
     else
-      puts "I don't know what you meant. Try again.\n".center($l)
+      puts "I don't know what you meant. Try again.\n".center(@l)
   end
 end
 
 
 def print_menu
     puts
-    puts "1. Input the students".center($l)
-    puts "2. Show the students".center($l)
-    puts "3. Save to specified CSV file.".center($l)
-    puts "4. Load from specified CSV file.".center($l)
-    puts "5. View source code?".center($l)
-    puts "6. Exit\n".center($l)
+    puts "1. Input the students".center(@l)
+    puts "2. Show the students".center(@l)
+    puts "3. Save to specified CSV file.".center(@l)
+    puts "4. Load from specified CSV file.".center(@l)
+    puts "5. View source code?".center(@l)
+    puts "6. Exit\n".center(@l)
 end
 
 
@@ -49,27 +49,6 @@ def show_students
   print_header
   print_students_list
   print_footer
-end
-
-def load_students(filename) #Ex.14 No.7
-  file_exists?(filename)
-  CSV.foreach(filename, "a+") do |fl|
-    @students << {name: fl[0], cohort: fl[1].to_sym}
-  end
-  puts
-  puts "Successfully loaded from #{filename}".center($l)
-end
-
-def file_exists?(filename)
-  if filename.empty?
-    puts "You entered a blank value.".center($l)
-    puts "Select and try again.".center($l)
-    interactive_menu
-  elsif !File.exists?(filename)
-    puts
-    puts "Sorry. #{filename} doesn't exist in this directory.\n".center($l)
-    interactive_menu
-  end
 end
 
 
@@ -81,8 +60,31 @@ def try_load_students
 end
 
 
+def load_students(filename = "students.csv") #Ex.14 No.7
+  file_exists?(filename)
+  CSV.foreach(filename, "a+") do |fl|
+    @students << {name: fl[0], cohort: fl[1].to_sym}
+  end
+  puts
+  puts "Successfully loaded from #{filename}".center(@l)
+end
+
+
+def file_exists?(filename)
+  if filename.empty?
+    puts "You entered a blank value.".center(@l)
+    puts "Select and try again.".center(@l)
+    interactive_menu
+  elsif !File.exists?(filename)
+    puts
+    puts "Sorry. #{filename} doesn't exist in this directory.\n".center(@l)
+    interactive_menu
+  end
+end
+
+
 def save_students #Ex.14 No.7
-  puts "Please supply a filename: ".center($l)
+  puts "Please supply a filename: ".center(@l)
   filename = STDIN.gets.sub("\n", "")
   file_exists?(filename)
   CSV.open(filename, "a+") do |csv|
@@ -90,14 +92,19 @@ def save_students #Ex.14 No.7
       csv << [student[:name], student[:cohort]]
     end
   end
-  puts "Successfully saved to #{filename}.".center($l)
+  puts "Successfully saved to #{filename}.".center(@l)
 end
 
 
-def error_correct
-  puts "To correct name, type 'n' then enter".center($l)
-  puts "To correct cohort, type 'c' then enter".center($l)
-  puts "To exit this option, press ENTER.\n".center($l)
+def please_check
+  puts "To correct name, type 'n' then enter".center(@l)
+  puts "To correct cohort, type 'c' then enter".center(@l)
+  puts "To exit this option, press ENTER.\n".center(@l)
+end
+
+
+def invalid
+  puts "Invalid entry. Try again.".center(@l)
 end
 
 
@@ -109,42 +116,33 @@ def input_students
     name_count += 1
     count = -1
     puts
-    puts first_line = "Please enter the name of the student\n".center($l)
+    puts first_line = "Please enter the name of the student\n".center(@l)
     info = STDIN.gets.sub("\n", "")
-    $l = first_line.size
+    @l = first_line.size
 
     while count < $arr.size - 1 do
       if info == ""
-        puts "You entered a blank value.\n\n".center($l)
+        puts "You entered a blank value.\n\n".center(@l)
         exit
       end
       count += 1
-      puts count.even? ? ("#{name_count}. " + info).center($l) : info.center($l)
+      puts info.center(@l)
       puts
-      puts ($arr[count][1]).center($l)
+      puts ($arr[count][1]).center(@l)
       student[($arr[count][0])] = info
       error = "y"
 
       if count == $arr.size - 1
         until error == "n"
-          error_correct
+          please_check
           error_num = STDIN.gets.sub("\n", "")
-          error_num == "" ? break : error_num
-          wrong = ""
-          invalid_entry(error_num, student)
-          wrong = student[($arr[0][0])] if error_num == "n"
-          wrong = student[($arr[1][0])] if error_num == "c"
-
+          add_student(student) if error_num == ""
+          main_error_check(error_num, student)
           puts
-          puts "Changing: #{wrong}".center($l)
-          right = STDIN.gets.sub("\n", "")
-          error_num == "n" ? student[($arr[0][0])] = right : student[($arr[1][0])] = right
-          puts "Changed #{wrong} to #{right}.".center($l)
-          puts
-          puts "Any more errors? y : n".center($l)
+          puts "Any more errors? y : n".center(@l)
           error_more = STDIN.gets.sub("\n", "")
           puts
-          check = invalid(error_more)
+          check = mini_error_check(error_more)
           add_student(student) unless check == "y"
           error = check
         end
@@ -160,6 +158,22 @@ def input_students
 end
 
 
+def main_error_check(error_num, student)
+  while !['n', 'c', ""].include?(error_num)
+    invalid
+    error_num = STDIN.gets.sub("\n", "")
+  end
+    add_student(student) if error_num == ""
+    wrong = student[($arr[0][0])] if error_num == "n"#{###################################################}
+    wrong = student[($arr[1][0])] if error_num == "c"#{###################################################}
+    puts
+    puts "Changing: #{wrong}".center(@l)
+    right = STDIN.gets.sub("\n", "")
+    error_num == "n" ? student[($arr[0][0])] = right : student[($arr[1][0])] = right
+    puts "Changed #{wrong} to #{right}.".center(@l)
+end
+
+
 def push_to_arr(student)
   @students << student
 end
@@ -167,10 +181,14 @@ end
 
 def add_student(student)
   puts
-  puts "Add another student? y : n ?".center($l)
+  puts
+  puts "Add another student? Enter y : n".center(@l)
   student_error = STDIN.gets.sub("\n", "")
   puts
-  invalid(student_error)
+  if !["y", "n"].include?(student_error)
+    invalid
+    add_student(student)
+  end
   if student_error == "n"
     push_to_arr(student)
     interactive_menu
@@ -181,28 +199,19 @@ def add_student(student)
 end
 
 
-def invalid(error)
+def mini_error_check(error)
   until error == "y" || error == "n"
-    puts "Invalid entry. Try again.".center($l)
+    invalid
     error = STDIN.gets.sub("\n", "")
   end
   error
 end
 
 
-def invalid_entry(error_num, student)
-  while !['n', 'c'].include?(error_num)
-    puts "Invalid entry. Try again.".center($l)
-    error_num = STDIN.gets.sub("\n", "")
-    return add_student(student) if error_num == ""
-  end
-end
-
-
 def print_header
   puts
-  puts "The students of Villains Academy".center($l)
-  puts "--------------------------------".center($l)
+  puts "The students of Villains Academy".center(@l)
+  puts "--------------------------------".center(@l)
 end
 
 
@@ -215,18 +224,19 @@ def print_students_list
       if ix == 0
         arr << month
         puts
-        puts "Students from the #{month} cohort: ".center($l)
+        puts "Students from the #{month} cohort: ".center(@l)
       else
         puts
-        puts "Students from the #{month} cohort: ".center($l) if !arr.include?(month)
+        puts "Students from the #{month} cohort: ".center(@l) if !arr.include?(month)
         arr << month
       end
 
      @students.each do |i2|
         if i2[:cohort] == month
-          puts ("Name: #{i2[:name]}").center($l)
+          puts ("Name: #{i2[:name]}").center(@l)
         end
       end
+
     end
   end
 end
@@ -235,16 +245,18 @@ end
 def print_footer
  @students.size != 1 ? s = "s" : s = ""
   puts
-  puts "Overall, we have #{@students.count} great student#{s}".center($l)
+  puts "Overall, we have #{@students.count} great student#{s}".center(@l)
   puts
 end
+
 
 def own_source
   open(__FILE__){|r| puts (r.read)}
 end
 
+
 try_load_students
-#load_students #added for Ex.14 No.2
+load_students #added for Ex.14 No.2
 interactive_menu
 @students = input_students
 print_header
